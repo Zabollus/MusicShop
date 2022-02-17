@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Kategorie
+{% endblock %}
+
+{% block content %}
+    <table class="table border-bottom" style="background-color: white; margin-top: 20px; margin-left: 50px">
+    <thead>
+    <tr class="d-flex text-color-darker">
+        <th scope="col">Nazwa kategorii</th>
+        <th scope="col">Opis</th>
+    </tr>
+    </thead>
+    <tbody class="text-color-lighter">
+    {% for category in categories %}
+        <tr class="d-flex">
+        <td>{{ category.name }}</td>
+        <td>{{ category.description }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Produkty
+{% endblock %}
+
+{% block content %}
+    {% for product in products %}
+        <p>Nazwa produktu: {{ product.name }}</p>
+        <p>Opis: {{ product.description }}</p>
+        <p>Kategoria: {{ product.category }}</p>
+        <p>Cena: {{ product.price }}</p>
+        <p>Średnia ocena: {{ product.score }}</p>
+    {% endfor %}
+{% endblock %}
