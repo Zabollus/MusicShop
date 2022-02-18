@@ -17,10 +17,10 @@ class Product(models.Model):
     name = models.CharField(max_length=64)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=8,decimal_places=2)
+    price = models.DecimalField(max_digits=8, decimal_places=2)
     stock = models.IntegerField()
-    votes = models.IntegerField()
-    score = models.DecimalField(max_digits=3, decimal_places=1)
+    votes = models.IntegerField(default=0)
+    score = models.DecimalField(max_digits=3, decimal_places=1, default=5.0)
 
     def __str__(self):
         return self.name

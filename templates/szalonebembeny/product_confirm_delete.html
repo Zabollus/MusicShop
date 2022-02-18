@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Usuń produkt {{ product.name }}{% endblock %}
+{% block content %}
+    <div style="background-color: white; margin: 50px; padding: 10px">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <label for="confirmation">Czy na pewno chcesz usunąć?</label><br>
+        <input name="confirmation" type="submit" value="Tak">
+    </form>
+    </div>
+{% endblock %}

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views import View
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render
 from szalonebembeny.models import Product, Category
 
@@ -31,3 +32,36 @@ class ProductsInCategory(View):
         title = f'Produkty z kategorii {Category.objects.get(id=id).name}'
         return render(request, 'products.html', {'products': products, 'title': title})
 
+
+class ProductAdd(CreateView):
+    model = Product
+    fields = 'name', 'description', 'category', 'price', 'stock'
+    success_url = '/products/'
+
+
+class ProductModify(UpdateView):
+    model = Product
+    fields = 'name', 'description', 'category', 'price', 'stock'
+    success_url = '/products/'
+
+
+class ProductDelete(DeleteView):
+    model = Product
+    success_url = '/products/'
+
+
+class CategoryAdd(CreateView):
+    model = Category
+    fields = '__all__'
+    success_url = '/categories/'
+
+
+class CategoryModify(UpdateView):
+    model = Category
+    fields = '__all__'
+    success_url = '/categories/'
+
+
+class CategoryDelete(DeleteView):
+    model = Category
+    success_url = '/categories/'
