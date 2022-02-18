@@ -5,5 +5,14 @@
 {% endblock %}
 
 {% block content %}
-    Najlepiej ocenianie produkty:
+    <table class="table" style="background-color: white; margin: 50px">
+    <tr>
+        <th>Najlepiej ocenianie produkty:</th>
+    </tr>
+    {% for product in products %}
+        <tr>
+        <td>{{ product.name }}</td>
+        </tr>
+    {% endfor %}
+    </table>
 {% endblock %}

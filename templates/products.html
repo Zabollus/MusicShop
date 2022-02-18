@@ -1,15 +1,36 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Produkty
+    {{ title }}
 {% endblock %}
 
 {% block content %}
+    <table class="table" style="background-color: white; margin: 50px">
+    <thead>
+    <tr class= "text-color-darker">
+        <th scope="col">Nazwa produktu</th>
+        <th scope="col">Opis</th>
+        <th scope="col">Kategoria</th>
+        <th scope="col">Cena</th>
+        <th scope="col">Średnia ocena</th>
+    </tr>
+    </thead>
+    <tbody class="text-color-lighter">
     {% for product in products %}
-        <p>Nazwa produktu: {{ product.name }}</p>
-        <p>Opis: {{ product.description }}</p>
-        <p>Kategoria: {{ product.category }}</p>
-        <p>Cena: {{ product.price }}</p>
-        <p>Średnia ocena: {{ product.score }}</p>
+        <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>
+            {% if title == 'Wszystkie produkty' %}
+            <a href="{% url 'category-products' id=product.category.id %}">{{ product.category }}</a>
+            {% else %}
+            {{ product.category }}
+            {% endif %}
+        </td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.score }}</td>
+        </tr>
     {% endfor %}
+    </tbody>
+    </table>
 {% endblock %}

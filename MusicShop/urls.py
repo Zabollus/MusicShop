@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from szalonebembeny.views import LandingPageView, ProductsView, CategoriesView
+from szalonebembeny.views import LandingPageView, ProductsView, CategoriesView, ProductsInCategory
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', LandingPageView.as_view(), name='main'),
     path('products/', ProductsView.as_view(), name='products'),
-    path('categories/', CategoriesView.as_view(), name='categories')
+    path('categories/', CategoriesView.as_view(), name='categories'),
+    path('productscategory/<int:id>', ProductsInCategory.as_view(), name='category-products')
 ]

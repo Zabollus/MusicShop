@@ -8,16 +8,26 @@ from szalonebembeny.models import Product, Category
 
 class LandingPageView(View):
     def get(self, request):
-        return render(request, 'index.html')
+        products_by_score = Product.objects.all().order_by('score')
+        return render(request, 'index.html', {'products': products_by_score})
 
 
 class ProductsView(View):
     def get(self, request):
         products = Product.objects.all()
-        return render(request, 'products.html', {'products': products})
+        title = 'Wszystkie produkty'
+        return render(request, 'products.html', {'products': products, 'title': title})
 
 
 class CategoriesView(View):
     def get(self, request):
         categories = Category.objects.all()
         return render(request, 'categories.html', {'categories': categories})
+
+
+class ProductsInCategory(View):
+    def get(self, request, id):
+        products = Product.objects.all().filter(category_id=id)
+        title = f'Produkty z kategorii {Category.objects.get(id=id).name}'
+        return render(request, 'products.html', {'products': products, 'title': title})
+

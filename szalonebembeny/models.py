@@ -9,6 +9,9 @@ class Category(models.Model):
     name = models.CharField(max_length=64)
     description = models.TextField()
 
+    def __str__(self):
+        return self.name
+
 
 class Product(models.Model):
     name = models.CharField(max_length=64)
@@ -18,6 +21,9 @@ class Product(models.Model):
     stock = models.IntegerField()
     votes = models.IntegerField()
     score = models.DecimalField(max_digits=3, decimal_places=1)
+
+    def __str__(self):
+        return self.name
 
 
 class Profile(models.Model):
@@ -59,6 +65,7 @@ class Order(models.Model):
     products = models.ManyToManyField(Product, through='OrderProducts')
     date = models.DateTimeField(auto_now_add=True)
     state = models.IntegerField(choices=STATES)
+    address = models.CharField(max_length=128)
 
 
 class OrderProducts(models.Model):
