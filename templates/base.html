@@ -27,20 +27,6 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'products' %}">Produkty</a>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled">Disabled</a>
-        </li>
       </ul>
       <form class="d-flex">
         <input class="form-control me-2" type="search" placeholder="Wyszukaj produkt lub kategorię" aria-label="Search">
@@ -51,5 +37,13 @@
 </nav>
 {% block content %}
 {% endblock %}
+<footer style="background-color: white; padding: 10px">
+    {% if user.is_authenticated %}
+        {{ user }} <a class="btn btn-danger" href="{% url 'logout' %}">Wyloguj</a>
+    {% else %}
+        <a class="btn btn-success" href="{% url 'login' %}">Zaloguj</a>
+        <a class="btn btn-warning" href="{% url 'register' %}">Rejestruj</a>
+    {% endif %}
+</footer>
 </body>
 </html>

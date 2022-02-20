@@ -18,22 +18,24 @@
     <tbody class="text-color-lighter">
     {% for product in products %}
         <tr>
-        <td>{{ product.name }}</td>
-        <td>{{ product.description }}</td>
-        <td>
+        <td class="col-1">{{ product.name }}</td>
+        <td class="col-3">{{ product.description }}</td>
+        <td class="col-1">
             {% if title == 'Wszystkie produkty' %}
             <a href="{% url 'category-products' id=product.category.id %}">{{ product.category }}</a>
             {% else %}
             {{ product.category }}
             {% endif %}
         </td>
-        <td>{{ product.price }}</td>
-        <td>{{ product.score }}</td>
-        <td><a type="button" class="btn btn-warning" href="{% url 'product-edit' pk=product.id %}">Edytuj</a></td>
-        <td><a type="button" class="btn btn-danger" href="{% url 'product-delete' pk=product.id %}">Usuń</a></td>
+        <td class="col-1">{{ product.price }}</td>
+        <td class="col-1">{{ product.score }}</td>
+        <td class="col-1"><a type="button" class="btn btn-warning" href="{% url 'product-edit' slug=product.slug %}">Edytuj</a></td>
+        <td><a type="button" class="btn btn-danger" href="{% url 'product-delete' slug=product.slug %}">Usuń</a></td>
         </tr>
     {% endfor %}
     </tbody>
     </table>
+    <div style="background-color: white; padding: 10px">
     <a type="button" class="btn btn-primary" href="{% url 'product-add' %}">Dodaj Produkt</a>
+    </div>
 {% endblock %}
