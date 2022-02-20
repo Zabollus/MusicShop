@@ -5,6 +5,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect
 from szalonebembeny.models import Product, Category, Profile
 from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 # Create your views here.
@@ -36,7 +37,9 @@ class ProductsInCategory(View):
         return render(request, 'products.html', {'products': products, 'title': title})
 
 
-class ProductAdd(View):
+class ProductAdd(PermissionRequiredMixin, View):
+    permission_required = 'szalonebembeny.add_product'
+
     def get(self, request):
         form = ProductAddForm()
         return render(request, "szalonebembeny/product_form.html", {'form': form})
@@ -58,30 +61,35 @@ class ProductAdd(View):
             return render(request, "szalonebembeny/product_form.html", {'form': form})
 
 
-class ProductModify(UpdateView):
+class ProductModify(PermissionRequiredMixin, UpdateView):
+    permission_required = 'szalonebembeny.change_product'
     model = Product
     fields = 'name', 'description', 'category', 'price', 'stock'
     success_url = '/products/'
 
 
-class ProductDelete(DeleteView):
+class ProductDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = 'szalonebembeny.delete_product'
     model = Product
     success_url = '/products/'
 
 
-class CategoryAdd(CreateView):
+class CategoryAdd(PermissionRequiredMixin, CreateView):
+    permission_required = 'szalonebembeny.add_category'
     model = Category
     fields = '__all__'
     success_url = '/categories/'
 
 
-class CategoryModify(UpdateView):
+class CategoryModify(PermissionRequiredMixin, UpdateView):
+    permission_required = 'szalonebembeny.change_category'
     model = Category
     fields = '__all__'
     success_url = '/categories/'
 
 
-class CategoryDelete(DeleteView):
+class CategoryDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = 'szalonebembeny.delete_category'
     model = Category
     success_url = '/categories/'
 

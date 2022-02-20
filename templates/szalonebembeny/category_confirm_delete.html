@@ -6,7 +6,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <label for="confirmation">Czy na pewno chcesz usunąć?</label><br>
-        <input name="confirmation" type="submit" value="Tak">
+        <input name="confirmation" class="btn btn-danger" type="submit" value="Tak">
     </form>
     </div>
 {% endblock %}

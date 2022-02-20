@@ -39,7 +39,7 @@
 {% endblock %}
 <footer style="background-color: white; padding: 10px">
     {% if user.is_authenticated %}
-        {{ user }} <a class="btn btn-danger" href="{% url 'logout' %}">Wyloguj</a>
+        Zalogowany jako {{ user }} <a class="btn btn-danger" href="{% url 'logout' %}">Wyloguj</a>
     {% else %}
         <a class="btn btn-success" href="{% url 'login' %}">Zaloguj</a>
         <a class="btn btn-warning" href="{% url 'register' %}">Rejestruj</a>
