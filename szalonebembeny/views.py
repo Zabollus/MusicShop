@@ -1,9 +1,10 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect
-from szalonebembeny.models import Product, Category, Profile
+from szalonebembeny.models import Product, Category, Profile, Cart, CartProducts, Comment
 from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
@@ -174,3 +175,54 @@ class ResetPasswordView(View):
             title = 'Resetowanie hasła'
             button = 'Resetuj'
             return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
+
+
+class ProductDetailsView(View):
+    def get(self, request, slug):
+        product = Product.objects.get(slug=slug)
+        liked_products = Profile.objects.get(user=request.user).liked_products.all()
+        product_in_liked = product in liked_products
+        comments = Comment.objects.all().filter(product=product)
+        return render(request, 'product-details.html', {
+            'product': product, 'product_in_like': product_in_liked, 'comments': comments
+        })
+
+    def post(self, request, slug):
+        product = Product.objects.get(slug=slug)
+        comments = Comment.objects.all().filter(product=product)
+        user = request.user
+        if request.POST.get('like') == 'like':
+            user_profile = Profile.objects.get(user=user)
+            user_profile.liked_products.add(product)
+            user_profile.save()
+            liked_products = Profile.objects.get(user=user).liked_products.all()
+            product_in_liked = product in liked_products
+            return render(request, 'product-details.html', {
+                'product': product, 'product_in_like': product_in_liked, 'comments': comments
+            })
+        elif request.POST.get('unlike') == 'unlike':
+            user_profile = Profile.objects.get(user=user)
+            user_profile.liked_products.remove(product)
+            user_profile.save()
+            liked_products = Profile.objects.get(user=user).liked_products.all()
+            product_in_liked = product in liked_products
+            return render(request, 'product-details.html', {
+                'product': product, 'product_in_like': product_in_liked, 'comments': comments
+            })
+        elif request.POST.get('cart') == 'cart':
+            liked_products = Profile.objects.get(user=user).liked_products.all()
+            product_in_liked = product in liked_products
+            try:
+                cart = Cart.objects.get(user=user)
+            except ObjectDoesNotExist:
+                cart = Cart.objects.create(user=user)
+            if CartProducts.objects.filter(cart=cart, product=product).exists():
+                cp = CartProducts.objects.get(cart=cart, product=product)
+                cp.amount += 1
+                cp.save()
+            else:
+                CartProducts.objects.create(cart=cart, product=product, amount=1)
+            return render(request, 'product-details.html', {
+                'product': product, 'product_in_like': product_in_liked, 'comments': comments
+            })
+

@@ -5,7 +5,10 @@
 {% endblock %}
 
 {% block content %}
-    <table class="table" style="background-color: white; margin: 50px">
+    <div class="container p-2 my-4" style="background-color: white">
+    <h2>Kategorie</h2>
+    </div>
+    <table class="table container my-4" style="background-color: white">
     <thead>
     <tr class= "text-color-darker">
         <th scope="col">Nazwa kategorii</th>
@@ -17,8 +20,10 @@
         <tr>
         <td><a href="{% url 'category-products' id=category.id %}">{{ category.name }}</a></td>
         <td>{{ category.description }}</td>
-            {% if perms.szalonebembeny.modify_category and perms.szalonebembeny.delete_category %}
+        {% if perms.szalonebembeny.change_category %}
         <td><a type="button" class="btn btn-warning" href="{% url 'category-edit' pk=category.id %}">Edytuj</a></td>
+        {% endif %}
+        {% if perms.szalonebembeny.delete_category %}
         <td><a type="button" class="btn btn-danger" href="{% url 'category-delete' pk=category.id %}">Usuń</a></td>
         {% endif %}
         </tr>

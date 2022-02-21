@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from szalonebembeny.views import LandingPageView, ProductsView, CategoriesView, ProductsInCategory, ProductAdd, \
     CategoryAdd, ProductModify, CategoryModify, ProductDelete, CategoryDelete, LoginView, LogoutView, RegisterView, \
-    ResetPasswordView
+    ResetPasswordView, ProductDetailsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,5 +34,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', RegisterView.as_view(), name='register'),
-    path('reset_password/<int:id>/', ResetPasswordView.as_view(), name='reset-password')
+    path('reset_password/<int:id>/', ResetPasswordView.as_view(), name='reset-password'),
+    path('product/<slug>/', ProductDetailsView.as_view(), name='product')
 ]

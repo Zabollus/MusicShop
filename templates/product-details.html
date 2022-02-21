@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ product.name }}
+{% endblock %}
+
+{% block content %}
+    <div class="container my-4" style="background-color: white">
+        <div class="row">
+            <div class="col">
+                <img src="{% static 'img/gretsch.jpg' %}" alt="Brak zdjęć">
+            </div>
+            <div class="col position-relative">
+                <ul class="list-unstyled p-3">
+                    <li class="h4 p-1">{{ product.name }}</li>
+                    <li class="p-1">{{ product.description }}</li>
+                    <li class="p-1">Kategoria: {{ product.category }}</li>
+                    <li class="p-1">Cena: {{ product.price }} zł</li>
+                    <li class="p-1">Ilość polubień: {{ product.votes }}</li>
+                    <li class="p-1">Średnia ocena: {{ product.score }}</li>
+                    <li class="p-1" style="color: {% if product.stock > 0 %}green">Dostępny{% else %}red">Niedostępny{% endif %}</li>
+                </ul>
+                {% if user.is_authenticated %}
+                <form method="POST">
+                    {% csrf_token %}
+                    {% if not product_in_like %}
+                        <button class="btn btn-success" style="width: 170px" type="submit" value="like" name="like">Polub</button>
+                    {% else %}
+                        <button class="btn btn-danger" style="width: 170px" type="submit" value="unlike" name="unlike">Usuń z polubionych</button>
+                    {% endif %}
+                    {% if product.stock > 0 %}
+                    <button class="btn btn-primary" style="width: 170px" type="submit" value="cart" name="cart">Dodaj do koszyka</button>
+                    {% endif %}
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row p-2">
+            <h2>Komentarze</h2>
+            {% for comment in comments %}
+                <div class="card mb-1">
+                    <h4 class="card-title">{{ comment.user.username }}</h4>
+                    <p class="card-subtitle">{{ comment.date }}</p>
+                    <h6 class="card-text">{{ comment.content }}</h6>
+                    <p class="card-text">Ocena: {{ comment.score }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
