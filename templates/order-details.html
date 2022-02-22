@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Szczegóły zamówienia {{ order.id }}
+{% endblock %}
+
+{% block content %}
+    <div class="container p-2 my-4" style="background-color: white">
+    <h2>Zamówienie {{ order.id }}</h2>
+    </div>
+    <table class="table container my-4" style="background-color: white">
+    <thead>
+    <tr class= "text-color-darker">
+        <th scope="col">Nazwa produktu</th>
+        <th scope="col">Cena</th>
+        <th scope="col">Ilość</th>
+        <th scope="col">Łączna kwota</th>
+    </tr>
+    </thead>
+    <tbody class="text-color-lighter">
+    {% for product in order.products.all %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.price }} zł</td>
+            {% for orderproduct in product.orderproducts_set.all %}
+                {% if orderproduct.order.user == user and orderproduct.order == order %}
+                    <td>{{ orderproduct.amount }}</td>
+                    <td>{% widthratio product.price 1 orderproduct.amount %}.00 zł</td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    <tr>
+        <td></td><td></td><td></td><td>{{ order.full_price }} zł</td>
+    </tr>
+    </table>
+    <div class="container p-2 my-4" style="background-color: white">
+    <table class="table">
+        <tr><td>Data złożenia zamówienia</td><td>{{ order.date }}</td></tr>
+        <tr><td>Status zamówienia</td><td>{{ order.get_state_display }}</td></tr>
+        <tr><td>Sposób dostawy</td><td>{{ order.get_deliver_method_display }}</td></tr>
+        <tr><td>Adres dostawy</td><td>{{ order.address }}</td></tr>
+        <tr><td>Metoda płatności</td><td>{{ order.get_payment_method_display }}</td></tr>
+    </table>
+    </div>
+{% endblock %}

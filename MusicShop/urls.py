@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from szalonebembeny.views import LandingPageView, ProductsView, CategoriesView, ProductsInCategory, ProductAdd, \
     CategoryAdd, ProductModify, CategoryModify, ProductDelete, CategoryDelete, LoginView, LogoutView, RegisterView, \
-    ResetPasswordView, ProductDetailsView, CartView, CommentAddView, ProductDeleteFromCartView, ProfileEditView
+    ResetPasswordView, ProductDetailsView, CartView, CommentAddView, ProductDeleteFromCartView, ProfileEditView, \
+    OrderAddView, OrdersView, OrderDetailsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,5 +40,8 @@ urlpatterns = [
     path('product/<slug>/', ProductDetailsView.as_view(), name='product'),
     path('comment_add/<slug>', CommentAddView.as_view(), name='comment-add'),
     path('cart/', CartView.as_view(), name='cart'),
-    path('cart/<slug>/delete', ProductDeleteFromCartView.as_view(), name='cart-product-delete')
+    path('cart/<slug>/delete', ProductDeleteFromCartView.as_view(), name='cart-product-delete'),
+    path('order_add/', OrderAddView.as_view(), name='order_add'),
+    path('orders/', OrdersView.as_view(), name='orders'),
+    path('order/<int:id>/', OrderDetailsView.as_view(), name='order')
 ]

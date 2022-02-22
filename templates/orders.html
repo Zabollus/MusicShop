@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Twoje zamówienia
+{% endblock %}
+
+{% block content %}
+    {% if orders|length > 0 %}
+    <div class="container p-2 my-4" style="background-color: white">
+    <h2>Twoje zamówienia</h2>
+    </div>
+    <table class="table container my-4" style="background-color: white">
+    <thead>
+    <tr class= "text-color-darker">
+        <th scope="col">Zamówienie</th>
+        <th scope="col">Data złożenia zamówienia</th>
+        <th scope="col">Status zamówienia</th>
+        <th scope="col">Sposób dostawy</th>
+        <th scope="col">Adres dostawy</th>
+        <th scope="col">Metoda płatności</th>
+        <th scope="col">Kwota zamówienia</th>
+    </tr>
+    </thead>
+    <tbody class="text-color-lighter">
+    {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.date }}</td>
+            <td>{{ order.get_state_display }}</td>
+            <td>{{ order.get_deliver_method_display }}</td>
+            <td>{{ order.address }}</td>
+            <td>{{ order.get_payment_method_display }}</td>
+            <td>{{ order.full_price }} zł</td>
+            <td><a class="btn btn-primary" href="{% url 'order' id=order.id %}">Szczegóły</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% else %}
+        <div class="container p-2 my-4" style="background-color: white">
+            <h2>Nie masz jeszcze zamówień</h2>
+        </div>
+    {% endif %}
+{% endblock %}

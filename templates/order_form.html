@@ -1,14 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Twój koszyk
+    Składanie zamówienia
 {% endblock %}
 
 {% block content %}
     <div class="container p-2 my-4" style="background-color: white">
-    <h2>Twój koszyk{{ emptycart }}</h2>
-    </div>
-    {% if emptycart == '' %}
+    <h2>Podsumowanie zamówienia</h2>
     <table class="table container my-4" style="background-color: white">
     <thead>
     <tr class= "text-color-darker">
@@ -29,12 +27,19 @@
                     <td>{% widthratio product.price 1 cartproduct.amount %}.00 zł</td>
                 {% endif %}
             {% endfor %}
-            <td><a type="button" class="btn btn-danger" href="{% url 'cart-product-delete' slug=product.slug %}">Usuń z koszyka</a></td>
         </tr>
     {% endfor %}
+    {% if cart.products.all|length > 1 %}
     <tr>
-        <td></td><td></td><td></td><td>{% if cart.products.all|length > 1 %}{{ full_cost }} zł{% endif %}</td><td><a type="button" class="btn btn-primary" href="{% url 'order_add' %}">Przejdź do zamówienia</a> </td>
+        <td></td><td></td><td></td><td>{{ full_cost }} zł</td>
     </tr>
-    </table>
     {% endif %}
+    </table>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn btn-primary" value="Złóż zamówienie">
+        <a href="{% url 'cart' %}" class="btn btn-danger">Wróc do koszyka</a>
+    </form>
+    </div>
 {% endblock %}

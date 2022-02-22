@@ -1,21 +1,15 @@
 import django.forms as forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-
-from szalonebembeny.models import Category
+from szalonebembeny.models import Category, DELIVER_METHODS, PAYMENT_METHODS
 
 
 class ProductAddForm(forms.Form):
-    name = forms.CharField(label='Nazwa produktu', max_length=64)
-    description = forms.CharField(label='Opis', widget=forms.Textarea)
-    category = forms.ModelChoiceField(label='Kategoria', queryset=Category.objects.all())
-    price = forms.DecimalField(label='Cena', max_digits=8, decimal_places=2, min_value=0)
-    stock = forms.IntegerField(label='Ilość na stanie', min_value=0)
-
-    def __init__(self, *args, **kwargs):
-        super(ProductAddForm, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs['class'] = 'form-control'
+    name = forms.CharField(label='Nazwa produktu', max_length=64, widget=forms.TextInput(attrs={'class': "form-control"}))
+    description = forms.CharField(label='Opis', widget=forms.Textarea(attrs={'class': "form-control"}))
+    category = forms.ModelChoiceField(label='Kategoria', queryset=Category.objects.all(), widget=forms.Select(attrs={'class': "form-select"}))
+    price = forms.DecimalField(label='Cena', max_digits=8, decimal_places=2, min_value=0, widget=forms.NumberInput(attrs={'class': "form-control"}))
+    stock = forms.IntegerField(label='Ilość na stanie', min_value=0, widget=forms.NumberInput(attrs={'class': "form-control"}))
 
 
 def validate_username_is_not_taken(value):
@@ -92,3 +86,9 @@ class ProfileEditForm(forms.Form):
         super(ProfileEditForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
+
+
+class OrderAddForm(forms.Form):
+    address = forms.CharField(label='Adres dostawy', max_length=128, widget=forms.TextInput(attrs={'class': "form-control"}))
+    deliver_method = forms.ChoiceField(label='Sposób dostawy', choices=DELIVER_METHODS, widget=forms.Select(attrs={'class': "form-select"}))
+    payment_method = forms.ChoiceField(label='Metoda płatności', choices=PAYMENT_METHODS, widget=forms.Select(attrs={'class': "form-select"}))

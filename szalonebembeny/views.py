@@ -5,8 +5,9 @@ from django.http import HttpResponse
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect
-from szalonebembeny.models import Product, Category, Profile, Cart, CartProducts, Comment
-from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm, CommentAddForm, ProfileEditForm
+from szalonebembeny.models import Product, Category, Profile, Cart, CartProducts, Comment, Order, OrderProducts
+from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm, CommentAddForm, \
+    ProfileEditForm, OrderAddForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
@@ -223,6 +224,8 @@ class ProductDetailsView(View):
                 cp.save()
             else:
                 CartProducts.objects.create(cart=cart, product=product, amount=1)
+            product.stock -= 1
+            product.save()
             return render(request, 'product-details.html', {
                 'product': product, 'product_in_like': product_in_liked, 'comments': comments
             })
@@ -284,6 +287,8 @@ class ProductDeleteFromCartView(View):
         else:
             cp.amount -= 1
             cp.save()
+        product.stock += 1
+        product.save()
         return redirect('cart')
 
 
@@ -319,3 +324,53 @@ class ProfileEditView(View):
             title = 'Edycja profilu'
             button = 'Edytuj'
             return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
+
+
+class OrderAddView(View):
+    def get(self, request):
+        profil = Profile.objects.get(user=request.user)
+        form = OrderAddForm(initial={'address': profil.address})
+        cart = Cart.objects.get(user=request.user)
+        full_cost = 0
+        for element in cart.cartproducts_set.all():
+            full_cost += element.amount * element.product.price
+        return render(request, 'order_form.html', {'form': form, 'cart': cart, 'full_cost': full_cost})
+
+    def post(self, request):
+        form = OrderAddForm(request.POST)
+        cart = Cart.objects.get(user=request.user)
+        full_cost = 0
+        for element in cart.cartproducts_set.all():
+            full_cost += element.amount * element.product.price
+        if form.is_valid():
+            order = Order.objects.create(
+                user=request.user,
+                address=form.cleaned_data['address'],
+                deliver_method=form.cleaned_data['deliver_method'],
+                payment_method=form.cleaned_data['payment_method'],
+                full_price=full_cost
+            )
+            for product in cart.products.all():
+                OrderProducts.objects.create(
+                    order=order,
+                    product=product,
+                    amount=product.cartproducts_set.get(cart=cart).amount
+                )
+            cart.delete()
+            Cart.objects.create(user=request.user)
+            return render(request, 'thank_you.html')
+
+        else:
+            return render(request, 'order_form.html', {'form': form, 'cart': cart, 'full_cost': full_cost})
+
+
+class OrdersView(View):
+    def get(self, request):
+        orders = Order.objects.all().filter(user=request.user)
+        return render(request, 'orders.html', {'orders': orders})
+
+
+class OrderDetailsView(View):
+    def get(self, request, id):
+        order = Order.objects.get(id=id)
+        return render(request, 'order-details.html', {'order': order})
