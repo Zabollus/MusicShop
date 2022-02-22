@@ -118,6 +118,7 @@ class RegisterView(View):
                 phone_number=form.cleaned_data['phone_number'],
                 address=form.cleaned_data['address']
             )
+            Cart.objects.create(user=u)
             login(request, u)
             return redirect('/')
         else:
@@ -215,10 +216,7 @@ class ProductDetailsView(View):
         elif request.POST.get('cart') == 'cart':
             liked_products = Profile.objects.get(user=user).liked_products.all()
             product_in_liked = product in liked_products
-            try:
-                cart = Cart.objects.get(user=user)
-            except ObjectDoesNotExist:
-                cart = Cart.objects.create(user=user)
+            cart = Cart.objects.get(user=user)
             if CartProducts.objects.filter(cart=cart, product=product).exists():
                 cp = CartProducts.objects.get(cart=cart, product=product)
                 cp.amount += 1
@@ -266,18 +264,13 @@ class CommentAddView(View):
 class CartView(View):
     def get(self, request):
         emptycart = ''
-        cart = ''
-        suma = ''
-        try:
-            cart = Cart.objects.get(user=request.user)
-            suma = 0
-            for element in cart.cartproducts_set.all():
-                suma += element.amount * element.product.price
-        except ObjectDoesNotExist:
-            emptycart = ' jest pusty'
+        cart = Cart.objects.get(user=request.user)
+        full_cost = 0
+        for element in cart.cartproducts_set.all():
+            full_cost += element.amount * element.product.price
         if len(cart.products.all()) == 0:
             emptycart = ' jest pusty'
-        return render(request, 'cart.html', {'cart': cart, 'emptycart': emptycart, 'suma': suma})
+        return render(request, 'cart.html', {'cart': cart, 'emptycart': emptycart, 'full_cost': full_cost})
 
 
 class ProductDeleteFromCartView(View):
