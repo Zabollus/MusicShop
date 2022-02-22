@@ -7,10 +7,10 @@ from szalonebembeny.models import Category
 
 class ProductAddForm(forms.Form):
     name = forms.CharField(label='Nazwa produktu', max_length=64)
-    description = forms.CharField(widget=forms.Textarea)
-    category = forms.ModelChoiceField(queryset=Category.objects.all())
-    price = forms.DecimalField(max_digits=8, decimal_places=2, min_value=0)
-    stock = forms.IntegerField(min_value=0)
+    description = forms.CharField(label='Opis', widget=forms.Textarea)
+    category = forms.ModelChoiceField(label='Kategoria', queryset=Category.objects.all())
+    price = forms.DecimalField(label='Cena', max_digits=8, decimal_places=2, min_value=0)
+    stock = forms.IntegerField(label='Ilość na stanie', min_value=0)
 
     def __init__(self, *args, **kwargs):
         super(ProductAddForm, self).__init__(*args, **kwargs)
@@ -69,3 +69,26 @@ class ResetPasswordForm(forms.Form):
         if cleaned_data['pass1'] != cleaned_data['pass2']:
             raise ValidationError('Hasła muszą być takie same')
         return cleaned_data
+
+
+class CommentAddForm(forms.Form):
+    content = forms.CharField(label='Treść komentarza', widget=forms.Textarea)
+    score = forms.DecimalField(label='Ocena', max_digits=3, decimal_places=1, max_value=10, min_value=0)
+
+    def __init__(self, *args, **kwargs):
+        super(CommentAddForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
+
+class ProfileEditForm(forms.Form):
+    first_name = forms.CharField(label='Imię', max_length=50)
+    last_name = forms.CharField(label='Nazwisko', max_length=50)
+    email = forms.EmailField(label='Adres e-mail')
+    phone_number = forms.CharField(label='Numer telefonu', max_length=9)
+    address = forms.CharField(label='Adres', max_length=128)
+
+    def __init__(self, *args, **kwargs):
+        super(ProfileEditForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'

@@ -1,11 +1,12 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect
 from szalonebembeny.models import Product, Category, Profile, Cart, CartProducts, Comment
-from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm
+from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm, CommentAddForm, ProfileEditForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
@@ -14,7 +15,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 class LandingPageView(View):
     def get(self, request):
-        products_by_score = Product.objects.all().order_by('score')
+        products_by_score = Product.objects.all().order_by('-score')
         return render(request, 'index.html', {'products': products_by_score})
 
 
@@ -158,16 +159,16 @@ class LogoutView(View):
 
 
 class ResetPasswordView(View):
-    def get(self, request, id):
+    def get(self, request):
         form = ResetPasswordForm()
         title = 'Resetowanie hasła'
         button = 'Resetuj'
         return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
 
-    def post(self, request, id):
+    def post(self, request):
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
-            u = User.objects.get(id=id)
+            u = request.user
             u.set_password(form.cleaned_data['pass1'])
             u.save()
             return redirect('/')
@@ -194,18 +195,20 @@ class ProductDetailsView(View):
         if request.POST.get('like') == 'like':
             user_profile = Profile.objects.get(user=user)
             user_profile.liked_products.add(product)
-            user_profile.save()
             liked_products = Profile.objects.get(user=user).liked_products.all()
             product_in_liked = product in liked_products
+            product.votes += 1
+            product.save()
             return render(request, 'product-details.html', {
                 'product': product, 'product_in_like': product_in_liked, 'comments': comments
             })
         elif request.POST.get('unlike') == 'unlike':
             user_profile = Profile.objects.get(user=user)
             user_profile.liked_products.remove(product)
-            user_profile.save()
             liked_products = Profile.objects.get(user=user).liked_products.all()
             product_in_liked = product in liked_products
+            product.votes -= 1
+            product.save()
             return render(request, 'product-details.html', {
                 'product': product, 'product_in_like': product_in_liked, 'comments': comments
             })
@@ -226,3 +229,100 @@ class ProductDetailsView(View):
                 'product': product, 'product_in_like': product_in_liked, 'comments': comments
             })
 
+
+class CommentAddView(View):
+    def get(self, request, slug):
+        form = CommentAddForm()
+        title = 'Dodawanie komentarza'
+        button = 'Dodaj'
+        return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
+
+    def post(self, request, slug):
+        form = CommentAddForm(request.POST)
+        if form.is_valid():
+            product = Product.objects.get(slug=slug)
+            content = form.cleaned_data['content']
+            score = form.cleaned_data['score']
+            Comment.objects.create(
+                user=request.user,
+                product=product,
+                content=content,
+                score=score
+            )
+            comments = Comment.objects.all().filter(product=product)
+            suma = 0
+            for comment in comments:
+                suma += comment.score
+            avg = suma/len(comments)
+            product.score = avg
+            product.save()
+            return redirect('product', slug=product.slug)
+        else:
+            title = 'Dodawanie komentarza'
+            button = 'Dodaj'
+            return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
+
+
+class CartView(View):
+    def get(self, request):
+        emptycart = ''
+        cart = ''
+        suma = ''
+        try:
+            cart = Cart.objects.get(user=request.user)
+            suma = 0
+            for element in cart.cartproducts_set.all():
+                suma += element.amount * element.product.price
+        except ObjectDoesNotExist:
+            emptycart = ' jest pusty'
+        if len(cart.products.all()) == 0:
+            emptycart = ' jest pusty'
+        return render(request, 'cart.html', {'cart': cart, 'emptycart': emptycart, 'suma': suma})
+
+
+class ProductDeleteFromCartView(View):
+    def get(self, request, slug):
+        product = Product.objects.get(slug=slug)
+        user = request.user
+        cart = Cart.objects.get(user=user)
+        cp = CartProducts.objects.get(cart=cart, product=product)
+        if cp.amount == 1:
+            cp.delete()
+        else:
+            cp.amount -= 1
+            cp.save()
+        return redirect('cart')
+
+
+class ProfileEditView(View):
+    def get(self, request):
+        user = request.user
+        profil = Profile.objects.get(user=user)
+        form = ProfileEditForm(initial={
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'phone_number': profil.phone_number,
+            'address': profil.address
+        })
+        title = 'Edycja profilu'
+        button = 'Edytuj'
+        return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
+
+    def post(self, request):
+        form = ProfileEditForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            profil = Profile.objects.get(user=user)
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.email = form.cleaned_data['email']
+            profil.phone_number = form.cleaned_data['phone_number']
+            profil.address = form.cleaned_data['address']
+            user.save()
+            profil.save()
+            return redirect('/')
+        else:
+            title = 'Edycja profilu'
+            button = 'Edytuj'
+            return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})

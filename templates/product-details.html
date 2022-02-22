@@ -18,7 +18,7 @@
                     <li class="p-1">Kategoria: {{ product.category }}</li>
                     <li class="p-1">Cena: {{ product.price }} zł</li>
                     <li class="p-1">Ilość polubień: {{ product.votes }}</li>
-                    <li class="p-1">Średnia ocena: {{ product.score }}</li>
+                    <li class="p-1">{% if product.score < 0 %}Brak ocen{% else %}Średnia ocena: {{ product.score }}{% endif %}</li>
                     <li class="p-1" style="color: {% if product.stock > 0 %}green">Dostępny{% else %}red">Niedostępny{% endif %}</li>
                 </ul>
                 {% if user.is_authenticated %}
@@ -46,6 +46,7 @@
                     <p class="card-text">Ocena: {{ comment.score }}</p>
                 </div>
             {% endfor %}
+            <a class="btn btn-primary" href="{% url 'comment-add' slug=product.slug %}" style="width: auto">Dodaj komentarz</a>
         </div>
     </div>
 {% endblock %}

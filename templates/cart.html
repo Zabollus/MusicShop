@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Twój koszyk
+{% endblock %}
+
+{% block content %}
+    <div class="container p-2 my-4" style="background-color: white">
+    <h2>Twój koszyk{{ emptycart }}</h2>
+    </div>
+    {% if emptycart == '' %}
+    <table class="table container my-4" style="background-color: white">
+    <thead>
+    <tr class= "text-color-darker">
+        <th scope="col">Nazwa produktu</th>
+        <th scope="col">Cena</th>
+        <th scope="col">Ilość</th>
+        <th scope="col">Łączna kwota</th>
+    </tr>
+    </thead>
+    <tbody class="text-color-lighter">
+    {% for product in cart.products.all %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.price }} zł</td>
+            {% for cartproduct in product.cartproducts_set.all %}
+                {% if cartproduct.cart.user == user %}
+                    <td>{{ cartproduct.amount }}</td>
+                    <td>{% widthratio product.price 1 cartproduct.amount %}.00 zł</td>
+                {% endif %}
+            {% endfor %}
+            <td><a type="button" class="btn btn-danger" href="{% url 'cart-product-delete' slug=product.slug %}">Usuń z koszyka</a></td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td></td><td></td><td></td><td>{{ suma }} zł</td>
+    </tr>
+    </table>
+    {% endif %}
+{% endblock %}

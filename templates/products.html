@@ -31,7 +31,7 @@
             {% endif %}
         </td>
         <td class="col-1">{{ product.price }}</td>
-        <td class="col-1">{{ product.score }}</td>
+        <td class="col-1">{% if product.score < 0 %}Brak ocen{% else %}{{ product.score }}{% endif %}</td>
         {% if perms.szalonebembeny.change_product %}
         <td class="col-1"><a type="button" class="btn btn-warning" href="{% url 'product-edit' slug=product.slug %}">Edytuj</a></td>
         {% endif %}

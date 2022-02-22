@@ -21,7 +21,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     stock = models.IntegerField()
     votes = models.IntegerField(default=0)
-    score = models.DecimalField(max_digits=3, decimal_places=1, default=5.0)
+    score = models.DecimalField(max_digits=3, decimal_places=1, default=-1)
 
     def __str__(self):
         return self.name
@@ -44,6 +44,9 @@ class Comment(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     score = models.DecimalField(max_digits=3, decimal_places=1)
 
+    def __str__(self):
+        return f'Komentarz {self.user.username} dla produktu {self.product.name}'
+
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -59,7 +62,7 @@ class CartProducts(models.Model):
     amount = models.IntegerField()
 
     def __str__(self):
-        return f'{self.product.name} w koszyku {self.cart.user.username}'
+        return f'{self.amount} {self.product.name} w koszyku {self.cart.user.username}'
 
 
 STATES = {
