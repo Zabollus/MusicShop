@@ -18,7 +18,7 @@ from django.urls import path
 from szalonebembeny.views import LandingPageView, ProductsView, CategoriesView, ProductsInCategory, ProductAdd, \
     CategoryAdd, ProductModify, CategoryModify, ProductDelete, CategoryDelete, LoginView, LogoutView, RegisterView, \
     ResetPasswordView, ProductDetailsView, CartView, CommentAddView, ProductDeleteFromCartView, ProfileEditView, \
-    OrderAddView, OrdersView, OrderDetailsView
+    OrderAddView, OrdersView, OrderDetailsView, LikedProductsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -43,5 +43,6 @@ urlpatterns = [
     path('cart/<slug>/delete', ProductDeleteFromCartView.as_view(), name='cart-product-delete'),
     path('order_add/', OrderAddView.as_view(), name='order_add'),
     path('orders/', OrdersView.as_view(), name='orders'),
-    path('order/<int:id>/', OrderDetailsView.as_view(), name='order')
+    path('order/<int:id>/', OrderDetailsView.as_view(), name='order'),
+    path('liked_products/', LikedProductsView.as_view(), name='liked_products')
 ]

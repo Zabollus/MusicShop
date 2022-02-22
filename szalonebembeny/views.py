@@ -374,3 +374,11 @@ class OrderDetailsView(View):
     def get(self, request, id):
         order = Order.objects.get(id=id)
         return render(request, 'order-details.html', {'order': order})
+
+
+class LikedProductsView(View):
+    def get(self, request):
+        profil = Profile.objects.get(user=request.user)
+        liked_products = profil.liked_products.all()
+        title = 'Polubione produkty'
+        return render(request, 'products.html', {'products': liked_products, 'title': title})

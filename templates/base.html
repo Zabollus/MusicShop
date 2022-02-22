@@ -42,6 +42,7 @@
         Zalogowany jako {{ user }}
         <a class="btn btn-secondary btn-sm mx-1" href="{% url 'cart' %}">Twój koszyk</a>
         <a class="btn btn-success btn-sm mx-1" href="{% url 'orders' %}">Twoje zamówienia</a>
+        <a class="btn btn-dark btn-sm mx-1" href="{% url 'liked_products' %}">Polubione produkty</a>
         <a class="btn btn-danger btn-sm mx-1 float-end" href="{% url 'logout' %}">Wyloguj</a>
         <a class="btn btn-warning btn-sm mx-1 float-end" href="{% url 'reset-password' %}">Zmiana hasła</a>
         <a class="btn btn-info btn-sm mx-1 float-end" href="{% url 'profile-edit' %}">Edytuj profil</a>
