@@ -25,7 +25,15 @@
             <td>{{ product.price }} zł</td>
             {% for cartproduct in product.cartproducts_set.all %}
                 {% if cartproduct.cart.user == user %}
-                    <td>{{ cartproduct.amount }}</td>
+                    <td>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input name="product_id" type="text" hidden value="{{ product.id }}">
+                        <button name="sub" class="btn btn-danger btn-sm w-25" type="submit" value="-1">-</button>
+                        {{ cartproduct.amount }}
+                        <button name="add" class="btn btn-success btn-sm w-25" type="submit" value="+1">+</button>
+                    </form>
+                    </td>
                     <td>{% widthratio product.price 1 cartproduct.amount %}.00 zł</td>
                 {% endif %}
             {% endfor %}
@@ -36,5 +44,6 @@
         <td></td><td></td><td></td><td>{% if cart.products.all|length > 1 %}{{ full_cost }} zł{% endif %}</td><td><a type="button" class="btn btn-primary" href="{% url 'order_add' %}">Przejdź do zamówienia</a> </td>
     </tr>
     </table>
+    {% include 'messages.html' %}
     {% endif %}
 {% endblock %}

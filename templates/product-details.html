@@ -31,8 +31,12 @@
                     {% endif %}
                     {% if product.stock > 0 %}
                     <button class="btn btn-primary" style="width: 170px" type="submit" value="cart" name="cart">Dodaj do koszyka</button>
+                        {% include 'messages.html' %}
                     {% endif %}
                 </form>
+                {% else %}
+                    <button type="button" class="btn btn-success w-auto" disabled>Zaloguj się, aby polubić</button>
+                    <button type="button" class="btn btn-primary w-auto" disabled>Zaloguj się, aby dodać do koszyka</button>
                 {% endif %}
             </div>
         </div>
@@ -47,7 +51,9 @@
                 </div>
             {% endfor %}
         {% if user.is_authenticated %}
-            <a class="btn btn-primary" href="{% url 'comment-add' slug=product.slug %}" style="width: auto">Dodaj komentarz</a>
+            <a class="btn btn-primary w-auto" href="{% url 'comment-add' slug=product.slug %}">Dodaj komentarz</a>
+        {% else %}
+            <button type="button" class="btn btn-primary w-auto" disabled>Zaloguj się, aby dodać komentarz</button>
         {% endif %}
         </div>
     </div>

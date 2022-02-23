@@ -49,7 +49,19 @@
         <a class="btn btn-warning mx-1" href="{% url 'register' %}">Rejestruj</a>
     {% endif %}
 </div>
+
+
+
 {% block content %}
 {% endblock %}
+
+<script>
+    setTimeout(function () {
+        if ($('#msg').length > 0) {
+            $('#msg').remove();
+        }
+    }, 2000)
+</script>
+
 </body>
 </html>

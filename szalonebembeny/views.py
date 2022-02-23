@@ -9,6 +9,7 @@ from szalonebembeny.models import Product, Category, Profile, Cart, CartProducts
 from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm, CommentAddForm, \
     ProfileEditForm, OrderAddForm
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib import messages
 
 
 # Create your views here.
@@ -228,6 +229,7 @@ class ProductDetailsView(View):
                 CartProducts.objects.create(cart=cart, product=product, amount=1)
             product.stock -= 1
             product.save()
+            messages.success(request, 'Dodałeś do koszyka')
             return render(request, 'product-details.html', {
                 'product': product, 'product_in_like': product_in_liked, 'comments': comments
             })
@@ -277,6 +279,31 @@ class CartView(LoginRequiredMixin, View):
             emptycart = ' jest pusty'
         return render(request, 'cart.html', {'cart': cart, 'emptycart': emptycart, 'full_cost': full_cost})
 
+    def post(self, request):
+        cart = Cart.objects.get(user=request.user)
+        product = Product.objects.get(id=request.POST.get('product_id'))
+        cartproduct = cart.cartproducts_set.get(product=product)
+        if request.POST.get('add') == '+1':
+            if product.stock == 0:
+                messages.error(request, 'Brak produktu')
+            else:
+                cartproduct.amount += 1
+                cartproduct.save()
+                product.stock -= 1
+                product.save()
+        elif request.POST.get('sub') == '-1':
+            cartproduct.amount -= 1
+            cartproduct.save()
+            product.stock += 1
+            product.save()
+        emptycart = ''
+        full_cost = 0
+        for element in cart.cartproducts_set.all():
+            full_cost += element.amount * element.product.price
+        if len(cart.products.all()) == 0:
+            emptycart = ' jest pusty'
+        return render(request, 'cart.html', {'cart': cart, 'emptycart': emptycart, 'full_cost': full_cost})
+
 
 class ProductDeleteFromCartView(LoginRequiredMixin, View):
     def get(self, request, slug):
@@ -284,13 +311,9 @@ class ProductDeleteFromCartView(LoginRequiredMixin, View):
         user = request.user
         cart = Cart.objects.get(user=user)
         cp = CartProducts.objects.get(cart=cart, product=product)
-        if cp.amount == 1:
-            cp.delete()
-        else:
-            cp.amount -= 1
-            cp.save()
-        product.stock += 1
+        product.stock += cp.amount
         product.save()
+        cp.delete()
         return redirect('cart')
 
 
