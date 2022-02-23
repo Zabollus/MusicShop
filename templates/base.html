@@ -35,9 +35,7 @@
     </div>
   </div>
 </nav>
-{% block content %}
-{% endblock %}
-<footer style="background-color: white; padding: 10px">
+<div class="p-2" style="background-color: white">
     {% if user.is_authenticated %}
         Zalogowany jako {{ user }}
         <a class="btn btn-secondary btn-sm mx-1" href="{% url 'cart' %}">Twój koszyk</a>
@@ -50,6 +48,8 @@
         <a class="btn btn-success mx-1" href="{% url 'login' %}">Zaloguj</a>
         <a class="btn btn-warning mx-1" href="{% url 'register' %}">Rejestruj</a>
     {% endif %}
-</footer>
+</div>
+{% block content %}
+{% endblock %}
 </body>
 </html>

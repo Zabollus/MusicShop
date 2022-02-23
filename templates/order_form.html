@@ -35,11 +35,13 @@
     </tr>
     {% endif %}
     </table>
+    <div class="d-flex align-items-center flex-column">
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" class="btn btn-primary" value="Złóż zamówienie">
         <a href="{% url 'cart' %}" class="btn btn-danger">Wróc do koszyka</a>
     </form>
+    </div>
     </div>
 {% endblock %}

@@ -74,12 +74,12 @@ STATES = {
 
 DELIVER_METHODS = {
     ('paczkomat', 'Paczkomat Inpost'),
-    ('poczta', 'PocztaPolska'),
+    ('poczta', 'Poczta Polska'),
     ('DPD', 'Kurier DPD')
 }
 
 PAYMENT_METHODS = {
-    ('przelew', 'Przelew interentowy'),
+    ('przelew', 'Przelew internetowy'),
     ('pobranie', 'Za pobraniem'),
     ('BLIK', 'Płatność BLIK')
 }

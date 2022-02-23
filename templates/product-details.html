@@ -46,7 +46,9 @@
                     <p class="card-text">Ocena: {{ comment.score }}</p>
                 </div>
             {% endfor %}
+        {% if user.is_authenticated %}
             <a class="btn btn-primary" href="{% url 'comment-add' slug=product.slug %}" style="width: auto">Dodaj komentarz</a>
+        {% endif %}
         </div>
     </div>
 {% endblock %}

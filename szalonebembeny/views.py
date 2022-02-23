@@ -1,6 +1,6 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from szalonebembeny.models import Product, Category, Profile, Cart, CartProducts, Comment, Order, OrderProducts
 from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm, CommentAddForm, \
     ProfileEditForm, OrderAddForm
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 
 
 # Create your views here.
@@ -154,13 +154,13 @@ class LoginView(View):
             return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
 
 
-class LogoutView(View):
+class LogoutView(LoginRequiredMixin, View):
     def get(self, request):
         logout(request)
         return redirect('/')
 
 
-class ResetPasswordView(View):
+class ResetPasswordView(LoginRequiredMixin, View):
     def get(self, request):
         form = ResetPasswordForm()
         title = 'Resetowanie hasła'
@@ -183,8 +183,10 @@ class ResetPasswordView(View):
 class ProductDetailsView(View):
     def get(self, request, slug):
         product = Product.objects.get(slug=slug)
-        liked_products = Profile.objects.get(user=request.user).liked_products.all()
-        product_in_liked = product in liked_products
+        product_in_liked = False
+        if request.user.is_authenticated:
+            liked_products = Profile.objects.get(user=request.user).liked_products.all()
+            product_in_liked = product in liked_products
         comments = Comment.objects.all().filter(product=product)
         return render(request, 'product-details.html', {
             'product': product, 'product_in_like': product_in_liked, 'comments': comments
@@ -231,7 +233,7 @@ class ProductDetailsView(View):
             })
 
 
-class CommentAddView(View):
+class CommentAddView(LoginRequiredMixin, View):
     def get(self, request, slug):
         form = CommentAddForm()
         title = 'Dodawanie komentarza'
@@ -264,7 +266,7 @@ class CommentAddView(View):
             return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
 
 
-class CartView(View):
+class CartView(LoginRequiredMixin, View):
     def get(self, request):
         emptycart = ''
         cart = Cart.objects.get(user=request.user)
@@ -276,7 +278,7 @@ class CartView(View):
         return render(request, 'cart.html', {'cart': cart, 'emptycart': emptycart, 'full_cost': full_cost})
 
 
-class ProductDeleteFromCartView(View):
+class ProductDeleteFromCartView(LoginRequiredMixin, View):
     def get(self, request, slug):
         product = Product.objects.get(slug=slug)
         user = request.user
@@ -292,7 +294,7 @@ class ProductDeleteFromCartView(View):
         return redirect('cart')
 
 
-class ProfileEditView(View):
+class ProfileEditView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
         profil = Profile.objects.get(user=user)
@@ -326,7 +328,7 @@ class ProfileEditView(View):
             return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
 
 
-class OrderAddView(View):
+class OrderAddView(LoginRequiredMixin, View):
     def get(self, request):
         profil = Profile.objects.get(user=request.user)
         form = OrderAddForm(initial={'address': profil.address})
@@ -364,19 +366,22 @@ class OrderAddView(View):
             return render(request, 'order_form.html', {'form': form, 'cart': cart, 'full_cost': full_cost})
 
 
-class OrdersView(View):
+class OrdersView(LoginRequiredMixin, View):
     def get(self, request):
         orders = Order.objects.all().filter(user=request.user)
         return render(request, 'orders.html', {'orders': orders})
 
 
-class OrderDetailsView(View):
+class OrderDetailsView(LoginRequiredMixin, View):
     def get(self, request, id):
         order = Order.objects.get(id=id)
-        return render(request, 'order-details.html', {'order': order})
+        if request.user == order.user:
+            return render(request, 'order-details.html', {'order': order})
+        else:
+            raise PermissionDenied
 
 
-class LikedProductsView(View):
+class LikedProductsView(LoginRequiredMixin, View):
     def get(self, request):
         profil = Profile.objects.get(user=request.user)
         liked_products = profil.liked_products.all()
