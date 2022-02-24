@@ -21,7 +21,7 @@
     <tbody class="text-color-lighter">
     {% for product in cart.products.all|dictsort:'name' %}
         <tr>
-            <td>{{ product.name }}</td>
+            <td><a href="{% url 'product' slug=product.slug %}">{{ product.name }}</a></td>
             <td>{{ product.price }} zł</td>
             {% for cartproduct in product.cartproducts_set.all %}
                 {% if cartproduct.cart.user == user %}

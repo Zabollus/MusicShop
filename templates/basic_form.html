@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-    <div style="background-color: white; margin: 50px; padding: 10px">
+    <div class="container d-flex align-content-center w-auto" style="background-color: white; margin: 50px; padding: 10px">
+    <div class="d-flex align-items-center flex-column">
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" class="btn btn-primary" value="{{ button }}">
     </form>
+    </div>
+    </div>
+    <div class="container">
+            {% include 'messages.html' %}
     </div>
 {% endblock %}

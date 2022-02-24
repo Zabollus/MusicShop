@@ -21,6 +21,14 @@ class LandingPageView(View):
         return render(request, 'index.html', {'products': products_by_score})
 
 
+class SearchResultsView(View):
+    def post(self, request):
+        query = request.POST.get('search')
+        products = Product.objects.all().filter(name__icontains=query)
+        categories = Category.objects.all().filter(name__icontains=query)
+        return render(request, 'search_results.html', {'products': products, 'categories': categories})
+
+
 class ProductsView(View):
     def get(self, request):
         products = Product.objects.all()
@@ -145,6 +153,7 @@ class LoginView(View):
             if user is None:
                 title = 'Logowanie'
                 button = 'Zaloguj'
+                messages.error(request, 'Błędny login lub hasło')
                 return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
             else:
                 login(request, user)
@@ -185,12 +194,17 @@ class ProductDetailsView(View):
     def get(self, request, slug):
         product = Product.objects.get(slug=slug)
         product_in_liked = False
+        comment_added = False
+        comments = Comment.objects.all().filter(product=product)
         if request.user.is_authenticated:
             liked_products = Profile.objects.get(user=request.user).liked_products.all()
             product_in_liked = product in liked_products
-        comments = Comment.objects.all().filter(product=product)
+            for comment in comments:
+                if comment.user == request.user:
+                    comment_added = True
         return render(request, 'product-details.html', {
-            'product': product, 'product_in_like': product_in_liked, 'comments': comments
+            'product': product, 'product_in_like': product_in_liked,
+            'comments': comments, 'comment_added': comment_added
         })
 
     def post(self, request, slug):
@@ -268,6 +282,41 @@ class CommentAddView(LoginRequiredMixin, View):
             return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
 
 
+class CommentEditView(View):
+    def get(self, request, slug):
+        comment = Comment.objects.get(user=request.user, product=Product.objects.get(slug=slug))
+        form = CommentAddForm(initial={
+            'content': comment.content,
+            'score': comment.score
+        })
+        title = 'Edycja komentarza'
+        button = 'Edytuj'
+        return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
+
+    def post(self, request, slug):
+        form = CommentAddForm(request.POST)
+        if form.is_valid():
+            product = Product.objects.get(slug=slug)
+            content = form.cleaned_data['content']
+            score = form.cleaned_data['score']
+            comment = Comment.objects.get(user=request.user, product=product)
+            comment.content = content
+            comment.score = score
+            comment.save()
+            comments = Comment.objects.all().filter(product=product)
+            suma = 0
+            for comment in comments:
+                suma += comment.score
+            avg = suma/len(comments)
+            product.score = avg
+            product.save()
+            return redirect('product', slug=product.slug)
+        else:
+            title = 'Edycja komentarza'
+            button = 'Edytuj'
+            return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
+
+
 class CartView(LoginRequiredMixin, View):
     def get(self, request):
         emptycart = ''
@@ -296,6 +345,8 @@ class CartView(LoginRequiredMixin, View):
             cartproduct.save()
             product.stock += 1
             product.save()
+            if cartproduct.amount == 0:
+                return redirect('cart-product-delete', slug=product.slug)
         emptycart = ''
         full_cost = 0
         for element in cart.cartproducts_set.all():

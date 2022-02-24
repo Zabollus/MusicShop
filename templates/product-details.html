@@ -53,7 +53,11 @@
                 </div>
             {% endfor %}
         {% if user.is_authenticated %}
-            <a class="btn btn-primary w-auto" href="{% url 'comment-add' slug=product.slug %}">Dodaj komentarz</a>
+            {% if comment_added %}
+                <a class="btn btn-primary w-auto" href="{% url 'comment-edit' slug=product.slug %}">Edytuj komentarz</a>
+            {% else %}
+                <a class="btn btn-primary w-auto" href="{% url 'comment-add' slug=product.slug %}">Dodaj komentarz</a>
+            {% endif %}
         {% else %}
             <button type="button" class="btn btn-primary w-auto" disabled>Zaloguj się, aby dodać komentarz</button>
         {% endif %}

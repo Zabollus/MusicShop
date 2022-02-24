@@ -17,12 +17,13 @@ from django.contrib import admin
 from django.urls import path
 from szalonebembeny.views import LandingPageView, ProductsView, CategoriesView, ProductsInCategory, ProductAdd, \
     CategoryAdd, ProductModify, CategoryModify, ProductDelete, CategoryDelete, LoginView, LogoutView, RegisterView, \
-    ResetPasswordView, ProductDetailsView, CartView, CommentAddView, ProductDeleteFromCartView, ProfileEditView, \
-    OrderAddView, OrdersView, OrderDetailsView, LikedProductsView
+    ResetPasswordView, ProductDetailsView, CartView, CommentAddView, CommentEditView, ProductDeleteFromCartView, \
+    ProfileEditView, OrderAddView, OrdersView, OrderDetailsView, LikedProductsView, SearchResultsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', LandingPageView.as_view(), name='main'),
+    path('search/', SearchResultsView.as_view(), name='search'),
     path('products/', ProductsView.as_view(), name='products'),
     path('categories/', CategoriesView.as_view(), name='categories'),
     path('productscategory/<int:id>', ProductsInCategory.as_view(), name='category-products'),
@@ -39,6 +40,7 @@ urlpatterns = [
     path('profile_edit/', ProfileEditView.as_view(), name='profile-edit'),
     path('product/<slug>/', ProductDetailsView.as_view(), name='product'),
     path('comment_add/<slug>', CommentAddView.as_view(), name='comment-add'),
+    path('comment_edit/<slug>', CommentEditView.as_view(), name='comment-edit'),
     path('cart/', CartView.as_view(), name='cart'),
     path('cart/<slug>/delete', ProductDeleteFromCartView.as_view(), name='cart-product-delete'),
     path('order_add/', OrderAddView.as_view(), name='order_add'),

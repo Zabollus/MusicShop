@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Wyniki wyszukiwania
+{% endblock %}
+
+{% block content %}
+    <div class="container p-2 my-4" style="background-color: white">
+    <h2>Wyniki wyszukiwania</h2>
+    </div>
+    <table class="table container my-4" style="background-color: white">
+    <thead>
+    {% if categories|length > 0 %}
+    <tr class= "text-color-darker">
+        <th scope="col">Nazwa kategorii</th>
+        <th scope="col">Opis</th>
+    </tr>
+    </thead>
+    <tbody class="text-color-lighter">
+    {% for category in categories %}
+        <tr>
+        <td><a href="{% url 'category-products' id=category.id %}">{{ category.name }}</a></td>
+        <td>{{ category.description }}</td>
+        {% if perms.szalonebembeny.change_category %}
+        <td><a type="button" class="btn btn-warning" href="{% url 'category-edit' pk=category.id %}">Edytuj</a></td>
+        {% endif %}
+        {% if perms.szalonebembeny.delete_category %}
+        <td><a type="button" class="btn btn-danger" href="{% url 'category-delete' pk=category.id %}">Usuń</a></td>
+        {% endif %}
+        </tr>
+    {% endfor %}
+    {% else %}
+        <tr class= "text-color-darker">
+        <th scope="col">Nie znaleziono kategorii</th>
+    </tr>
+    </thead>
+    {% endif %}
+    <thead>
+    {% if products|length > 0 %}
+    <tr class= "text-color-darker">
+        <th scope="col">Nazwa produktu</th>
+        <th scope="col">Opis</th>
+        <th scope="col">Kategoria</th>
+        <th scope="col">Cena</th>
+        <th scope="col">Ocena</th>
+    </tr>
+    </thead>
+    {% for product in products %}
+        <tr>
+        <td><a href="{% url 'product' slug=product.slug %}">{{ product.name }}</a></td>
+        <td>{{ product.description }}</td>
+        <td>
+            <a href="{% url 'category-products' id=product.category.id %}">{{ product.category }}</a>
+        </td>
+        <td class="col-1">{{ product.price }} zł</td>
+        <td class="col-1">{% if product.score < 0 %}Brak ocen{% else %}{{ product.score }}{% endif %}</td>
+        {% if perms.szalonebembeny.change_product %}
+        <td class="col-1"><a type="button" class="btn btn-warning" href="{% url 'product-edit' slug=product.slug %}">Edytuj</a></td>
+        {% endif %}
+        {% if perms.szalonebembeny.delete_product %}
+        <td><a type="button" class="btn btn-danger" href="{% url 'product-delete' slug=product.slug %}">Usuń</a></td>
+        {% endif %}
+        </tr>
+    {% endfor %}
+    {% else %}
+        <tr class= "text-color-darker">
+        <th scope="col">Nie znaleziono produktów</th>
+    </tr>
+    </thead>
+    {% endif %}
+    </tbody>
+    </table>
+{% endblock %}
