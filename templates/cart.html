@@ -19,7 +19,7 @@
     </tr>
     </thead>
     <tbody class="text-color-lighter">
-    {% for product in cart.products.all %}
+    {% for product in cart.products.all|dictsort:'name' %}
         <tr>
             <td>{{ product.name }}</td>
             <td>{{ product.price }} zł</td>
@@ -29,9 +29,9 @@
                     <form method="post">
                         {% csrf_token %}
                         <input name="product_id" type="text" hidden value="{{ product.id }}">
-                        <button name="sub" class="btn btn-danger btn-sm w-25" type="submit" value="-1">-</button>
+                        <button name="sub" class="btn btn-outline-danger btn-sm" style="border-width: 2px; font-size: 20px; line-height: 25px; width: 40px" type="submit" value="-1">&#8722;</button>
                         {{ cartproduct.amount }}
-                        <button name="add" class="btn btn-success btn-sm w-25" type="submit" value="+1">+</button>
+                        <button name="add" class="btn btn-outline-success btn-sm" style="border-width: 2px; font-size: 20px; line-height: 25px; width: 40px" type="submit" value="+1">&#65291;</button>
                     </form>
                     </td>
                     <td>{% widthratio product.price 1 cartproduct.amount %}.00 zł</td>
@@ -44,6 +44,8 @@
         <td></td><td></td><td></td><td>{% if cart.products.all|length > 1 %}{{ full_cost }} zł{% endif %}</td><td><a type="button" class="btn btn-primary" href="{% url 'order_add' %}">Przejdź do zamówienia</a> </td>
     </tr>
     </table>
-    {% include 'messages.html' %}
+        <div class="container d-flex justify-content-center">
+            {% include 'messages.html' %}
+        </div>
     {% endif %}
 {% endblock %}

@@ -13,7 +13,7 @@
     <script src="{% static "szalonebembeny/js/bootstrap.js" %}"> </script>
 </head>
 <body style="background-image: url('{% static 'img/background2.jpg' %}')" >
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="{% url 'main' %}">Szalone Bembeny</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,15 +50,14 @@
     {% endif %}
 </div>
 
-
-
 {% block content %}
 {% endblock %}
 
 <script>
     setTimeout(function () {
-        if ($('#msg').length > 0) {
-            $('#msg').remove();
+        let monit = document.getElementById('msg');
+        if (monit) {
+            monit.remove();
         }
     }, 2000)
 </script>
