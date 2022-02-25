@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from szalonebembeny.models import Category, Product, Profile, CartProducts, Comment
+from szalonebembeny.models import Category, Product, Profile, CartProducts, Comment, Order, OrderProducts
 import pytest
 
 
@@ -570,3 +570,99 @@ def test_profile_edit(client, normal_user, normal_user_profile):
     assert u.email == 'abc@abc.com'
     assert p.phone_number == '987654321'
     assert p.address == 'Street 2'
+
+
+@pytest.mark.django_db
+def test_order_add_get_no_user(client):
+    url = reverse('order_add')
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_order_add_get(client, normal_user, normal_user_profile, normal_user_cart, example_cartproduct):
+    url = reverse('order_add')
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.context['full_cost'] == 1000
+
+
+@pytest.mark.django_db
+def test_order_add(client, normal_user, normal_user_profile, normal_user_cart, example_cartproduct):
+    url = reverse('order_add')
+    client.force_login(normal_user)
+    dct = {
+        'address': 'Testowa 12',
+        'deliver_method': 'paczkomat',
+        'payment_method': 'BLIK'
+    }
+    client.post(url, dct)
+    assert Order.objects.all().first().user == normal_user
+    assert Order.objects.all().first().address == 'Testowa 12'
+    assert Order.objects.all().first().deliver_method == 'paczkomat'
+    assert Order.objects.all().first().payment_method == 'BLIK'
+    assert Order.objects.all().first().full_price == 1000
+    assert OrderProducts.objects.all().first().amount == 1
+
+
+@pytest.mark.django_db
+def test_orders_no_user(client):
+    url = reverse('orders')
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_orders(client, normal_user, example_order, example_orderproduct):
+    url = reverse('orders')
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.context['orders'][0] == example_order
+    assert response.context['orders'][0].user == normal_user
+
+
+@pytest.mark.django_db
+def test_order_details_no_user(client, example_order):
+    url = reverse('order', args=[example_order.id])
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_order_details_another_user(client, other_normal_user, example_order, example_orderproduct):
+    url = reverse('order', args=[example_order.id])
+    client.force_login(other_normal_user)
+    response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_order_details(client, normal_user, example_order, example_orderproduct):
+    url = reverse('order', args=[example_order.id])
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.context['order'] == example_order
+
+
+@pytest.mark.django_db
+def test_liked_products_no_user(client):
+    url = reverse('liked_products')
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_liked_products(client, normal_user, example_product, example_liked_products):
+    url = reverse('liked_products')
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.context['products'][0] == example_product
+    assert response.context['products'].count() == 1

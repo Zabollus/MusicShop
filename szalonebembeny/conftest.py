@@ -38,9 +38,8 @@ def user_worker():
 
 @pytest.fixture
 def normal_user():
-    u = User.objects.create_user(username='Test', password='1234', first_name='Jan',
+    return User.objects.create_user(username='Test', password='1234', first_name='Jan',
                                  last_name='Kowalski', email='test@test.pl')
-    return u
 
 
 @pytest.fixture
@@ -73,3 +72,25 @@ def example_comment(example_product, normal_user):
 @pytest.fixture
 def example_cartproduct(example_product, normal_user_cart):
     return CartProducts.objects.create(cart=normal_user_cart, product=example_product, amount=1)
+
+
+@pytest.fixture
+def example_order(example_product, normal_user):
+    return Order.objects.create(user=normal_user, address='Testowa 45', deliver_method='poczta',
+                                payment_method='przelew', full_price=3000)
+
+
+@pytest.fixture
+def example_orderproduct(example_product, example_order):
+    return OrderProducts.objects.create(order=example_order, product=example_product, amount=3)
+
+
+@pytest.fixture
+def other_normal_user():
+    return User.objects.create_user(username='nick', password='54321', first_name='Piotr',
+                                    last_name='Zieliński', email='test@test.com')
+
+
+@pytest.fixture
+def example_liked_products(normal_user, normal_user_profile, example_product):
+    normal_user_profile.liked_products.add(example_product)
