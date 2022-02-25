@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from szalonebembeny.models import Category, Product, Profile
+from szalonebembeny.models import Category, Product, Profile, CartProducts, Comment
 import pytest
 
 
@@ -357,11 +357,216 @@ def test_logout_no_user(client):
 @pytest.mark.django_db
 def test_reset_password(client, normal_user):
     url = reverse('reset-password')
+    client.force_login(normal_user)
     dct = {
         'pass1': '12345',
         'pass2': '12345'
     }
-    client.post(url, dct)
+    response = client.post(url, dct)
     client.login(username='Test', password='12345')
-    response = client.get('/')
     assert response.wsgi_request.user.is_authenticated
+
+
+@pytest.mark.django_db
+def test_reset_password_get(client, normal_user):
+    url = reverse('reset-password')
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_reset_password_no_user(client):
+    url = reverse('reset-password')
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_product_details(client, example_product, example_comment):
+    url = reverse('product', args=[example_product.slug])
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.context['product'].name == 'Gitara elektryczna'
+    assert response.context['product'].description == 'Gitara wymagająca wzmacniacza i prądu'
+    assert response.context['product'].price == 1000
+    assert response.context['product'].stock == 10
+    assert response.context['comments'].count() == 1
+
+
+@pytest.mark.django_db
+def test_product_details_like(client, example_product, normal_user, normal_user_profile):
+    url = reverse('product', args=[example_product.slug])
+    client.force_login(normal_user)
+    dct = {
+        'like': 'like'
+    }
+    client.post(url, dct)
+    assert example_product in Profile.objects.get(user=normal_user).liked_products.all()
+
+
+@pytest.mark.django_db
+def test_product_details_cart(client, example_product, normal_user, normal_user_profile, normal_user_cart):
+    url = reverse('product', args=[example_product.slug])
+    client.force_login(normal_user)
+    dct = {
+        'cart': 'cart'
+    }
+    client.post(url, dct)
+    assert CartProducts.objects.all().first().product == example_product
+
+
+@pytest.mark.django_db
+def test_comment_add_no_user(client, example_product):
+    url = reverse('comment-add', args=[example_product.slug])
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_comment_add_get(client, normal_user, example_product):
+    url = reverse('comment-add', args=[example_product.slug])
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_comment_add(client, example_product, normal_user):
+    url = reverse('comment-add', args=[example_product.slug])
+    client.force_login(normal_user)
+    dct = {
+        'content': 'super',
+        'score': 9.0
+    }
+    client.post(url, dct)
+    assert Comment.objects.get(**dct)
+
+
+@pytest.mark.django_db
+def test_comment_edit_no_user(client, example_product):
+    url = reverse('comment-edit', args=[example_product.slug])
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_comment_edit_get(client, normal_user, example_product, example_comment):
+    url = reverse('comment-edit', args=[example_product.slug])
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_comment_edit(client, normal_user, example_product, example_comment):
+    url = reverse('comment-edit', args=[example_product.slug])
+    client.force_login(normal_user)
+    dct = {
+        'content': 'test',
+        'score': 10.0
+    }
+    client.post(url, dct)
+    assert Comment.objects.get(**dct)
+
+
+@pytest.mark.django_db
+def test_cart_get_no_user(client):
+    url = reverse('cart')
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_cart_get(client, normal_user, example_cartproduct):
+    url = reverse('cart')
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.context['cart'].cartproducts_set.all().count() == 1
+    assert response.context['full_cost'] == 1000
+
+
+@pytest.mark.django_db
+def test_cart_add(client, normal_user, example_cartproduct, example_product):
+    url = reverse('cart')
+    client.force_login(normal_user)
+    dct = {
+        'add': '+1',
+        'product_id': example_product.id
+    }
+    client.post(url, dct)
+    assert CartProducts.objects.all().first().amount == 2
+    assert Product.objects.all().first().stock == 9
+
+
+@pytest.mark.django_db
+def test_cart_sub(client, normal_user, example_cartproduct, example_product):
+    url = reverse('cart')
+    client.force_login(normal_user)
+    dct = {
+        'sub': '-1',
+        'product_id': example_product.id
+    }
+    client.post(url, dct)
+    assert CartProducts.objects.all().first().amount == 0
+    assert Product.objects.all().first().stock == 11
+
+
+@pytest.mark.django_db
+def test_product_delete_from_cart_get_no_user(client, example_product):
+    url = reverse('cart-product-delete', args=[example_product.slug])
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_product_delete_from_cart_get(client, normal_user, example_product, example_cartproduct):
+    url = reverse('cart-product-delete', args=[example_product.slug])
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('cart'))
+    assert CartProducts.objects.all().first() is None
+
+
+@pytest.mark.django_db
+def test_profile_edit_get_no_user(client):
+    url = reverse('profile-edit')
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url.startswith(reverse('login'))
+
+
+@pytest.mark.django_db
+def test_profile_edit_get(client, normal_user, normal_user_profile):
+    url = reverse('profile-edit')
+    client.force_login(normal_user)
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_profile_edit(client, normal_user, normal_user_profile):
+    url = reverse('profile-edit')
+    client.force_login(normal_user)
+    dct = {
+        'first_name': 'Paweł',
+        'last_name': 'Nowak',
+        'email': 'abc@abc.com',
+        'phone_number': '987654321',
+        'address': 'Street 2'
+    }
+    client.post(url, dct)
+    u = User.objects.all().first()
+    p = Profile.objects.all().first()
+    assert u.first_name == 'Paweł'
+    assert u.last_name == 'Nowak'
+    assert u.email == 'abc@abc.com'
+    assert p.phone_number == '987654321'
+    assert p.address == 'Street 2'

@@ -38,8 +38,19 @@ def user_worker():
 
 @pytest.fixture
 def normal_user():
-    u = User.objects.create_user(username='Test', password='1234')
+    u = User.objects.create_user(username='Test', password='1234', first_name='Jan',
+                                 last_name='Kowalski', email='test@test.pl')
     return u
+
+
+@pytest.fixture
+def normal_user_profile(normal_user):
+    return Profile.objects.create(user=normal_user, phone_number='123456789', address='Testowa 1')
+
+
+@pytest.fixture
+def normal_user_cart(normal_user):
+    return Cart.objects.create(user=normal_user)
 
 
 @pytest.fixture
@@ -48,18 +59,17 @@ def example_category():
 
 
 @pytest.fixture
-def example_product():
-    category1 = Category.objects.create(name='Instrumenty strunowe', description='Trzeba grać na strunach')
+def example_product(normal_user, example_category):
     return Product.objects.create(name='Gitara elektryczna', slug='gitara_elektryczna',
-                           description='Gitara wymagająca wzmacniacza i prądu', category=category1,
+                           description='Gitara wymagająca wzmacniacza i prądu', category=example_category,
                            price=1000, stock=10, votes=5, score=8.0)
 
 
 @pytest.fixture
-def example_comment():
-    category1 = Category.objects.create(name='Instrumenty strunowe', description='Trzeba grać na strunach')
-    product1 = Product.objects.create(name='Gitara elektryczna', slug='gitara_elektryczna',
-                                  description='Gitara wymagająca wzmacniacza i prądu', category=category1,
-                                  price=1000, stock=10, votes=5, score=8.0)
-    u = User.objects.create_user(username='Test', password='1234')
-    return Comment.objects.create(product=product1, user=u, content='Polecam', score=7.0)
+def example_comment(example_product, normal_user):
+    return Comment.objects.create(product=example_product, user=normal_user, content='Polecam', score=7.0)
+
+
+@pytest.fixture
+def example_cartproduct(example_product, normal_user_cart):
+    return CartProducts.objects.create(cart=normal_user_cart, product=example_product, amount=1)
