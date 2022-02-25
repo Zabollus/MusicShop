@@ -17,7 +17,7 @@ from django.contrib import messages
 
 class LandingPageView(View):
     def get(self, request):
-        products_by_score = Product.objects.all().order_by('-score')
+        products_by_score = Product.objects.all().order_by('-score')[:5]
         return render(request, 'index.html', {'products': products_by_score})
 
 
@@ -282,7 +282,7 @@ class CommentAddView(LoginRequiredMixin, View):
             return render(request, 'basic_form.html', {'form': form, 'title': title, 'button': button})
 
 
-class CommentEditView(View):
+class CommentEditView(LoginRequiredMixin, View):
     def get(self, request, slug):
         comment = Comment.objects.get(user=request.user, product=Product.objects.get(slug=slug))
         form = CommentAddForm(initial={
