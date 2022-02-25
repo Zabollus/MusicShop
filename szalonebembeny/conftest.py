@@ -45,3 +45,21 @@ def normal_user():
 @pytest.fixture
 def example_category():
     return Category.objects.create(name='test', description='opis testowy')
+
+
+@pytest.fixture
+def example_product():
+    category1 = Category.objects.create(name='Instrumenty strunowe', description='Trzeba grać na strunach')
+    return Product.objects.create(name='Gitara elektryczna', slug='gitara_elektryczna',
+                           description='Gitara wymagająca wzmacniacza i prądu', category=category1,
+                           price=1000, stock=10, votes=5, score=8.0)
+
+
+@pytest.fixture
+def example_comment():
+    category1 = Category.objects.create(name='Instrumenty strunowe', description='Trzeba grać na strunach')
+    product1 = Product.objects.create(name='Gitara elektryczna', slug='gitara_elektryczna',
+                                  description='Gitara wymagająca wzmacniacza i prądu', category=category1,
+                                  price=1000, stock=10, votes=5, score=8.0)
+    u = User.objects.create_user(username='Test', password='1234')
+    return Comment.objects.create(product=product1, user=u, content='Polecam', score=7.0)

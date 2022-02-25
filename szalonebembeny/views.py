@@ -165,12 +165,18 @@ class LoginView(View):
 
 
 class LogoutView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request):
         logout(request)
         return redirect('/')
 
 
 class ResetPasswordView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request):
         form = ResetPasswordForm()
         title = 'Resetowanie hasła'
@@ -250,6 +256,9 @@ class ProductDetailsView(View):
 
 
 class CommentAddView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request, slug):
         form = CommentAddForm()
         title = 'Dodawanie komentarza'
@@ -283,6 +292,9 @@ class CommentAddView(LoginRequiredMixin, View):
 
 
 class CommentEditView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request, slug):
         comment = Comment.objects.get(user=request.user, product=Product.objects.get(slug=slug))
         form = CommentAddForm(initial={
@@ -318,6 +330,9 @@ class CommentEditView(LoginRequiredMixin, View):
 
 
 class CartView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request):
         emptycart = ''
         cart = Cart.objects.get(user=request.user)
@@ -357,6 +372,9 @@ class CartView(LoginRequiredMixin, View):
 
 
 class ProductDeleteFromCartView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request, slug):
         product = Product.objects.get(slug=slug)
         user = request.user
@@ -369,6 +387,9 @@ class ProductDeleteFromCartView(LoginRequiredMixin, View):
 
 
 class ProfileEditView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request):
         user = request.user
         profil = Profile.objects.get(user=user)
@@ -403,6 +424,9 @@ class ProfileEditView(LoginRequiredMixin, View):
 
 
 class OrderAddView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request):
         profil = Profile.objects.get(user=request.user)
         form = OrderAddForm(initial={'address': profil.address})
@@ -441,12 +465,18 @@ class OrderAddView(LoginRequiredMixin, View):
 
 
 class OrdersView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request):
         orders = Order.objects.all().filter(user=request.user)
         return render(request, 'orders.html', {'orders': orders})
 
 
 class OrderDetailsView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request, id):
         order = Order.objects.get(id=id)
         if request.user == order.user:
@@ -456,6 +486,9 @@ class OrderDetailsView(LoginRequiredMixin, View):
 
 
 class LikedProductsView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
     def get(self, request):
         profil = Profile.objects.get(user=request.user)
         liked_products = profil.liked_products.all()
