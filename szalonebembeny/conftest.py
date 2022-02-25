@@ -1,4 +1,6 @@
 import pytest
+from django.contrib.auth.models import User, Permission
+
 from szalonebembeny.models import Product, Category, Profile, Comment, Cart, CartProducts, Order, OrderProducts
 
 
@@ -24,3 +26,22 @@ def six_products_two_categories():
     Product.objects.create(name='Puzon', slug='puzon',
                            description='Instrument dety z grupy aerofonów ustnikowych', category=category2,
                            price=2600, stock=22, votes=0, score=-1)
+
+
+@pytest.fixture
+def user_worker():
+    u = User.objects.create_user(username='worker', password='work')
+    permission = Permission.objects.all().filter(content_type_id__in=[8, 10])
+    u.user_permissions.set(permission)
+    return u
+
+
+@pytest.fixture
+def normal_user():
+    u = User.objects.create_user(username='Test', password='1234')
+    return u
+
+
+@pytest.fixture
+def example_category():
+    return Category.objects.create(name='test', description='opis testowy')

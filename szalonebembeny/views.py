@@ -31,14 +31,14 @@ class SearchResultsView(View):
 
 class ProductsView(View):
     def get(self, request):
-        products = Product.objects.all()
+        products = Product.objects.all().order_by('category__name')
         title = 'Wszystkie produkty'
         return render(request, 'products.html', {'products': products, 'title': title})
 
 
 class CategoriesView(View):
     def get(self, request):
-        categories = Category.objects.all()
+        categories = Category.objects.all().order_by('name')
         return render(request, 'categories.html', {'categories': categories})
 
 

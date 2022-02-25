@@ -6,22 +6,22 @@ from django.db import models
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=64)
-    description = models.TextField()
+    name = models.CharField(max_length=64, verbose_name='Nazwa')
+    description = models.TextField(verbose_name='Opis')
 
     def __str__(self):
         return self.name
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=64, unique=True)
-    slug = models.SlugField(max_length=64, unique=True)
-    description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    stock = models.IntegerField()
-    votes = models.IntegerField(default=0)
-    score = models.DecimalField(max_digits=3, decimal_places=1, default=-1)
+    name = models.CharField(max_length=64, unique=True, verbose_name='Nazwa')
+    slug = models.SlugField(max_length=64, unique=True, verbose_name='Opis')
+    description = models.TextField(verbose_name='Opis')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Kategoria')
+    price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='cena')
+    stock = models.IntegerField(verbose_name='Ilość')
+    votes = models.IntegerField(default=0, verbose_name='głosy')
+    score = models.DecimalField(max_digits=3, decimal_places=1, default=-1, verbose_name='Ocena')
 
     def __str__(self):
         return self.name
