@@ -1,7 +1,7 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.http import HttpResponse
+from slugify import slugify
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect
@@ -64,8 +64,7 @@ class ProductAdd(PermissionRequiredMixin, View):
             category = form.cleaned_data['category']
             price = form.cleaned_data['price']
             stock = form.cleaned_data['stock']
-            slug = name.replace(' ', '_').lower().replace('ą', 'a').replace('ę', 'e').replace('ó', 'o'). \
-                replace('ć', 'c').replace('ń', 'n').replace('ł', 'l').replace('ż', 'z').replace('ź', 'z')
+            slug = slugify(name)
             Product.objects.create(name=name, slug=slug, description=description,
                                    category=category, price=price, stock=stock)
             return redirect('/products')

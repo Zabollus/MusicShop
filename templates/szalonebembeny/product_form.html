@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}Dodaj produkt{% endblock %}
+{% block title %}Dodaj/Edytuj produkt{% endblock %}
 {% block content %}
     <div style="background-color: white; margin: 50px; padding: 10px">
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" class="btn btn-primary" value="Dodaj">
+        <input type="submit" class="btn btn-primary" value="Zapisz">
     </form>
     </div>
 {% endblock %}

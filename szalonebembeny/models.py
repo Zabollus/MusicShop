@@ -22,6 +22,7 @@ class Product(models.Model):
     stock = models.IntegerField(verbose_name='Ilość')
     votes = models.IntegerField(default=0, verbose_name='głosy')
     score = models.DecimalField(max_digits=3, decimal_places=1, default=-1, verbose_name='Ocena')
+    imgpath = models.CharField(max_length=64, default='Brak zdjęcia')
 
     def __str__(self):
         return self.name
