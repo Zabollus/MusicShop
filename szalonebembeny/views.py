@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from szalonebembeny.models import Product, Category, Profile, Cart, CartProducts, Comment, Order, OrderProducts
 from szalonebembeny.forms import ProductAddForm, RegisterForm, LoginForm, ResetPasswordForm, CommentAddForm, \
     ProfileEditForm, OrderAddForm
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 
 
@@ -472,16 +472,19 @@ class OrdersView(LoginRequiredMixin, View):
         return render(request, 'orders.html', {'orders': orders})
 
 
-class OrderDetailsView(LoginRequiredMixin, View):
+class OrderDetailsView(UserPassesTestMixin, View):
     login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
+    def test_func(self):
+        order = Order.objects.get(id=self.kwargs.get('id'))
+        if self.request.user == order.user:
+            return True
+        return False
+
     def get(self, request, id):
         order = Order.objects.get(id=id)
-        if request.user == order.user:
-            return render(request, 'order-details.html', {'order': order})
-        else:
-            raise PermissionDenied
+        return render(request, 'order-details.html', {'order': order})
 
 
 class LikedProductsView(LoginRequiredMixin, View):

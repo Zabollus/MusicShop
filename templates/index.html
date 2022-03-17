@@ -8,10 +8,12 @@
 <table class="table container my-4" style="background-color: white">
     <tr>
         <th>Najlepiej ocenianie produkty:</th>
+        <th>Ocena:</th>
     </tr>
     {% for product in products %}
     <tr>
         <td><a href="{% url 'product' slug=product.slug %}">{{ product.name }}</a></td>
+        <td>{{ product.score }}</td>
     </tr>
     {% endfor %}
 </table>
