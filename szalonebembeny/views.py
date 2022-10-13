@@ -1,7 +1,7 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from slugify import slugify
+from django.utils.text import slugify
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect
