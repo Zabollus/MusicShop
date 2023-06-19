@@ -11,6 +11,8 @@ services:
     command: > 
       sh -c "python manage.py wait_for_db &&
              python manage.py migrate &&
+             python manage.py loaddata users.json &&
+             python manage.py loaddata initial_data.json &&
              python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
