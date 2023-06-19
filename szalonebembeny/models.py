@@ -32,7 +32,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=9)
     address = models.CharField(max_length=128)
-    liked_products = models.ManyToManyField(Product)
+    liked_products = models.ManyToManyField(Product, blank=True)
 
     def __str__(self):
         return f'Profil {self.user.username}'
