@@ -2,8 +2,6 @@ version: "3.8"
 services:
   app:
     build: .
-    volumes:
-      - .:/musicshop
     ports:
       - 8000:8000
     image: app:musicshop
@@ -19,8 +17,8 @@ services:
   db:
     image: postgres:alpine
     restart: always
-#    volumes:
-#      - ./data/db:/var/lib/postgresql/data
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=musicshop
       - POSTGRES_USER=postgres
