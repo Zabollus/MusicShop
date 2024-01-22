@@ -15,8 +15,8 @@ def six_products_two_categories():
                            description='Można zagrać hejnał', category=category2,
                            price=1200, stock=30, votes=20, score=10.0)
     Product.objects.create(name='Gitara basowa', slug='gitara_basowa',
-                           description='Gitara wymagająca wzmacniacza i prądu, sluży do ciężkich brzmień', category=category1,
-                           price=1500, stock=50, votes=3, score=9.0)
+                           description='Gitara wymagająca wzmacniacza i prądu, sluży do ciężkich brzmień',
+                           category=category1, price=1500, stock=50, votes=3, score=9.0)
     Product.objects.create(name='Gitara akustyczna', slug='gitara_akustyczna',
                            description='Gitara wyposażona w pudło rezonansowe', category=category1,
                            price=2000, stock=15, votes=8, score=6.0)
@@ -39,7 +39,7 @@ def user_worker():
 @pytest.fixture
 def normal_user():
     return User.objects.create_user(username='Test', password='1234', first_name='Jan',
-                                 last_name='Kowalski', email='test@test.pl')
+                                    last_name='Kowalski', email='test@test.pl')
 
 
 @pytest.fixture
@@ -60,8 +60,8 @@ def example_category():
 @pytest.fixture
 def example_product(normal_user, example_category):
     return Product.objects.create(name='Gitara elektryczna', slug='gitara_elektryczna',
-                           description='Gitara wymagająca wzmacniacza i prądu', category=example_category,
-                           price=1000, stock=10, votes=5, score=8.0)
+                                  description='Gitara wymagająca wzmacniacza i prądu', category=example_category,
+                                  price=1000, stock=10, votes=5, score=8.0)
 
 
 @pytest.fixture
